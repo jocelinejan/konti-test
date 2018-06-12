@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>BRI Featured Banner TEST</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.6/d3.min.js" charset="utf-8"></script>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body { margin:0; padding:0; }
+        #map {
+          position:absolute;
+          top:0;
+          bottom:0;
+          width:100%; }
+        svg{
+          position: absolute;
+          width: 100%;
+          height: 100%;
+        }
+        path {
+          stroke: cyan;
+          stroke-width: 1.5;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          fill-opacity: 0;
+        }
+        circle {
+          fill: cyan;
+        }
+    </style>
+</head>
+
+<body>
+  <div id='map'></div>
+
+  <script>
+
+    mapboxgl.accessToken = 'pk.eyJ1Ijoia29udGluZW50YWxpc3QiLCJhIjoiY2owbmk2emVsMDA5cDJxbjIwc3B3ajgycyJ9.DUmWD84hIMDixi8dWZekAg';
+
+    var map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/dark-v9',
+      center: [64.781,35.427],
+      pitch: 0,
+      bearing: 0,
+      zoom: 3
+    });
+
+  map.addControl(new mapboxgl.NavigationControl());
+
+  var container = map.getCanvasContainer();
+
+  var svg = d3.select(container).append("svg");
+
+  var transform = d3.geo.transform({point:projectPoint});
+  var path = d3.geo.path().projection(transform);
+
+  map.on('load', function () {
+    d3.json("map.geojson", function(err1, data1) {
+      d3.json("dots.geojson", function(err, data){
+        drawData(data, data1);
+      });
+    });
+
+    map.addLayer({
+            "id": "principal-rail",
+            "type": "line",
+            "source": {
+                type: 'vector',
+                url: 'mapbox://kontinentalist.cyyf4nud'
+            },
+            "source-layer": "prinipalrail1-3togic",
+            "layout": {
+                "line-join": "round",
+                "line-cap": "round"
+            },
+            "paint": {
+                "line-color": "cyan",
+                "line-width": 1,
+                "line-opacity": 0.2,
+            }
+    });
+
+    map.addLayer({
+            "id": "cpec",
+            "type": "line",
+            "source": {
+                type: 'vector',
+                url: 'mapbox://kontinentalist.077n9gbi'
+            },
+            "source-layer": "cpec-3jiujv",
+            "layout": {
+                "line-join": "round",
+                "line-cap": "round"
+            },
+            "paint": {
+                "line-color": "#f4eee0",
+                "line-width": 1,
+                "line-opacity": 0.7,
+              }
+      });
+  });
+
+  function project(d) {
+      return map.project(new mapboxgl.LngLat(+d[0], +d[1]));
+  }
+
+  function projectPoint(lon, lat) {
+    var point = map.project(new mapboxgl.LngLat(lon, lat));
+    this.stream.point(point.x, point.y);
+  }
+
+  var lines;
+  var circles;
+
+  function drawData(data, data1) {
+    console.log("draw data");
+
+    lines = svg.selectAll("path")
+      .data(data1.features)
+      .enter()
+      .append("path")
+      .attr("d", path);
+
+    var totalLength = lines.node().getTotalLength();
+
+    lines
+    .attr("stroke-dasharray", totalLength + " " + totalLength)
+    .attr("stroke-dashoffset", totalLength)
+    .transition()
+      .duration(3000)
+      .ease("linear")
+      .attr("stroke-dashoffset", 0);
+
+    circles = svg.selectAll("circle")
+      .data(data.features)
+      .enter()
+      .append("circle")
+      .attr("r", 1);
+
+
+    circles
+      .transition()
+      .delay(function(d,i){
+        console.log(i,d); return i * 150
+      })
+      .attr("r", 3.5)
+      .ease("linear");
+
+    update();
+
+    map.on("viewreset", update);
+    map.on("move", update);
+    map.on("moveend", update);
+
+  }
+
+
+  function update() {
+    console.log("update");
+
+    circles.attr("cx", function(d) { return project(d.geometry.coordinates).x })
+           .attr("cy", function(d) { return project(d.geometry.coordinates).y });
+
+    lines.attr("d", path);
+  };
+
+</script>
+
+</body>
+</html>
