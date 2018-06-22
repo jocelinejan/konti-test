@@ -63,7 +63,7 @@
 
   // Load map and dataset
   map.on('load', function () {
-    d3.json("map.geojson", function(err1, data1) {
+    d3.json("BRICorridors.json", function(err1, data1) {
       d3.json("dots.geojson", function(err, data){
         drawData(data, data1);
       });
