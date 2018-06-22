@@ -62,11 +62,9 @@
   var path = d3.geo.path().projection(transform);
 
   // Load map and dataset
-  map.on('load', function () {
-    d3.json("BRICorridors.json", function(err1, data1) {
-      d3.json("dots.geojson", function(err, data){
-        drawData(data, data1);
-      });
+  map.on ('load', function() {
+    d3.json("bricorridorsmerge.json", function(err, data) {
+      drawData(data);
     });
 
     map.addLayer({
@@ -87,6 +85,7 @@
                 "line-opacity": 0.2,
             }
         });
+
   });
 
   function project(d) {
@@ -101,43 +100,43 @@
   var lines;
   var circles;
 
-  function drawData(data, data1) {
+  function drawData(data) {
     console.log("draw data");
 
     lines = svg.selectAll("path")
-      .data(data1.features)
+      .data(data.features)
       .enter()
       .append("path")
       .attr("d", path);
 
-    circles = svg.selectAll("circle")
-      .data(data.features)
-      .enter()
-      .append("circle")
-      .attr("r", 1);
+    // circles = svg.selectAll("circle")
+    //   .data(data.features)
+    //   .enter()
+    //   .append("circle")
+    //   .attr("r", 1);
 
     var totalLength = lines.node().getTotalLength();
-    var duration = 3000;
+    var duration = 4000;
 
-    var segments = [0];
-    for(var i = 1; i < data.features.length; i++) {
-        var tmp = svg.append('line')
-            .datum([data.features[i-1], data.features[i]])
-            .attr('x1', function(d) {
-              return project(d[0].geometry.coordinates).x
-            })
-            .attr('y1', function(d) {
-              return project(d[0].geometry.coordinates).y
-            })
-            .attr('x2', function(d) {
-              return project(d[1].geometry.coordinates).x
-            })
-            .attr('y2', function(d) {
-              return project(d[1].geometry.coordinates).y
-            });
-        segments.push(segments[i-1] + tmp.node().getTotalLength());
-        tmp.remove();
-    }
+    // var segments = [0];
+    // for(var i = 1; i < data.features.length; i++) {
+    //     var tmp = svg.append('line')
+    //         .datum([data.features[i-1], data.features[i]])
+    //         .attr('x1', function(d) {
+    //           return project(d[0].geometry.coordinates).x
+    //         })
+    //         .attr('y1', function(d) {
+    //           return project(d[0].geometry.coordinates).y
+    //         })
+    //         .attr('x2', function(d) {
+    //           return project(d[1].geometry.coordinates).x
+    //         })
+    //         .attr('y2', function(d) {
+    //           return project(d[1].geometry.coordinates).y
+    //         });
+    //     segments.push(segments[i-1] + tmp.node().getTotalLength());
+    //     tmp.remove();
+    // }
 
     lines
     .attr("stroke-dasharray", totalLength + " " + totalLength)
@@ -147,12 +146,12 @@
       .ease("linear")
       .attr("stroke-dashoffset", 0);
 
-    circles
-      .transition()
-      .delay(function(d,i){
-        return segments[i] * duration / totalLength
-      })
-      .attr("r", 4);
+    // circles
+    //   .transition()
+    //   .delay(function(d,i){
+    //     return segments[i] * duration / totalLength
+    //   })
+    //   .attr("r", 4);
 
     update();
 
@@ -166,8 +165,8 @@
   function update() {
     console.log("update");
 
-    circles.attr("cx", function(d) { return project(d.geometry.coordinates).x })
-           .attr("cy", function(d) { return project(d.geometry.coordinates).y });
+    // circles.attr("cx", function(d) { return project(d.geometry.coordinates).x })
+    //        .attr("cy", function(d) { return project(d.geometry.coordinates).y });
 
     lines.attr("d", path);
   };
