@@ -6,6 +6,7 @@
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.6/d3.min.js" charset="utf-8"></script>
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
+    <script src="https://unpkg.com/topojson@3"></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.css' rel='stylesheet' />
     <style>
         body { margin:0; padding:0; }
@@ -20,7 +21,7 @@
           height: 100%;
         }
         path {
-          stroke: cyan;
+          /* stroke: #4facfe; */
           stroke-width: 1.5;
           stroke-linecap: round;
           stroke-linejoin: round;
@@ -38,11 +39,11 @@
   <script>
 
     // Set-up map
-    mapboxgl.accessToken = 'pk.eyJ1Ijoia29udGluZW50YWxpc3QiLCJhIjoiY2owbmk2emVsMDA5cDJxbjIwc3B3ajgycyJ9.DUmWD84hIMDixi8dWZekAg';
+    mapboxgl.accessToken = 'pk.eyJ1Ijoiam9jZWxpbmVqYW4iLCJhIjoiY2ppd3JncjQ1MWVjajNqbnpidGVjaW00aiJ9.nh6L1QFtK7sBE5lc-z4jnw';
 
     var map = new mapboxgl.Map({
       container: 'map',
-      style: 'mapbox://styles/mapbox/dark-v9',
+      style: 'mapbox://styles/jocelinejan/cjj47pprc42j62ss96hmw4h9p',
       center: [64.781,35.427],
       pitch: 0,
       bearing: 0,
@@ -63,28 +64,29 @@
 
   // Load map and dataset
   map.on ('load', function() {
-    d3.json("bricorridorsmerge.json", function(err, data) {
-      drawData(data);
+    d3.json("bricorridorsmerge_topo.json", function(err, topo_data) {
+      var geo_data = topojson.feature(topo_data, topo_data.objects.bricorridorsmerge);
+      drawData(geo_data);
     });
 
     map.addLayer({
-            "id": "principal-rail",
-            "type": "line",
-            "source": {
-                type: 'vector',
-                url: 'mapbox://kontinentalist.cyyf4nud'
-            },
-            "source-layer": "prinipalrail1-3togic",
-            "layout": {
-                "line-join": "round",
-                "line-cap": "round"
-            },
-            "paint": {
-                "line-color": "cyan",
-                "line-width": 1,
-                "line-opacity": 0.2,
-            }
-        });
+        "id": "principal-rail",
+        "type": "line",
+        "source": {
+            type: 'vector',
+            url: 'mapbox://kontinentalist.cyyf4nud'
+        },
+        "source-layer": "prinipalrail1-3togic",
+        "layout": {
+            "line-join": "round",
+            "line-cap": "round"
+        },
+        "paint": {
+            "line-color": "#21d4fd",
+            "line-width": 1,
+            "line-opacity": 0.3,
+        }
+    });
 
   });
 
@@ -97,61 +99,63 @@
     this.stream.point(point.x, point.y);
   }
 
+var defs = svg.append("defs");
+
+  var gradient = defs.append("linearGradient")
+     .attr("id", "svgGradient")
+     .attr("x1", "0%")
+     .attr("x2", "100%")
+     .attr("y1", "0%")
+     .attr("y2", "100%");
+
+  gradient.append("stop")
+     .attr('class', 'start')
+     .attr("offset", "0%")
+     .attr("stop-color", "#b721ff")
+     .attr("stop-opacity", 1);
+
+  // gradient.append("stop")
+  //    .attr('class', 'end')
+  //    .attr("offset", "50%")
+  //    .attr("stop-color", "#20BDFF")
+  //    .attr("stop-opacity", 1);
+
+  gradient.append("stop")
+      .attr('class', 'end')
+      .attr("offset", "100%")
+      .attr("stop-color", "#21d4fd")
+      .attr("stop-opacity", 1);
+
+
   var lines;
   var circles;
 
-  function drawData(data) {
+  function drawData(nelb) {
     console.log("draw data");
+    var duration = 7000;
 
-    lines = svg.selectAll("path")
-      .data(data.features)
+    var g = svg.append('g')
+    lines = svg.selectAll('path')
+      .data(nelb.features)
       .enter()
       .append("path")
-      .attr("d", path);
+      .attr("d", path)
 
-    // circles = svg.selectAll("circle")
-    //   .data(data.features)
-    //   .enter()
-    //   .append("circle")
-    //   .attr("r", 1);
-
-    var totalLength = lines.node().getTotalLength();
-    var duration = 4000;
-
-    // var segments = [0];
-    // for(var i = 1; i < data.features.length; i++) {
-    //     var tmp = svg.append('line')
-    //         .datum([data.features[i-1], data.features[i]])
-    //         .attr('x1', function(d) {
-    //           return project(d[0].geometry.coordinates).x
-    //         })
-    //         .attr('y1', function(d) {
-    //           return project(d[0].geometry.coordinates).y
-    //         })
-    //         .attr('x2', function(d) {
-    //           return project(d[1].geometry.coordinates).x
-    //         })
-    //         .attr('y2', function(d) {
-    //           return project(d[1].geometry.coordinates).y
-    //         });
-    //     segments.push(segments[i-1] + tmp.node().getTotalLength());
-    //     tmp.remove();
-    // }
 
     lines
-    .attr("stroke-dasharray", totalLength + " " + totalLength)
-    .attr("stroke-dashoffset", totalLength)
-    .transition()
-      .duration(duration)
-      .ease("linear")
-      .attr("stroke-dashoffset", 0);
-
-    // circles
-    //   .transition()
-    //   .delay(function(d,i){
-    //     return segments[i] * duration / totalLength
-    //   })
-    //   .attr("r", 4);
+      .attr("stroke-dasharray", function() {
+          var totalLength = this.getTotalLength();
+          return totalLength + " " + totalLength;
+      })
+      .attr("stroke-dashoffset", function() {
+          var totalLength = this.getTotalLength();
+          return totalLength;
+      })
+      .attr("stroke", "url(#svgGradient)")
+      .transition()
+          .duration(function() { return Math.random() * duration;})
+          .ease("linear")
+          .attr("stroke-dashoffset", 0);
 
     update();
 
@@ -163,11 +167,6 @@
 
 
   function update() {
-    console.log("update");
-
-    // circles.attr("cx", function(d) { return project(d.geometry.coordinates).x })
-    //        .attr("cy", function(d) { return project(d.geometry.coordinates).y });
-
     lines.attr("d", path);
   };
 
