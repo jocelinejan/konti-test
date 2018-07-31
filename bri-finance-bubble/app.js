@@ -15,21 +15,9 @@ d3.csv('bri-funds.csv').then(function(data){
 
 function drawCircles(data){
 
-  //set color based on Category
-  var colorScale = d3.scaleOrdinal()
-  .domain(function(d){
-    return d.Category
-  })
-  .range(["#4cdf95",
-            "#b68ef2",
-            "#6ed6aa",
-            "#b5aae9",
-            "#5cddd2",
-            "#76a4ee",
-            "#54c3e5"]);
 
 
-  var simulation = d3.forceSimulation()
+  let simulation = d3.forceSimulation()
   // .force("x", d3.forceX(width/2).strength(0.05))
   // .force("y", d3.forceY(height/2).strength(0.05))
   .force('center', d3.forceCenter(width/2, height/2))
@@ -37,28 +25,42 @@ function drawCircles(data){
     .target([width/2, height/2])
     .strength(0.01))
   .force('cluster', d3.forceCluster()
-    .centers(function (d) { return d.Category; })
+    .centers(function (d) { return data[d.Category]; })
     .strength(0.5)
     .centerInertia(0.1))
   .force("collide", d3.forceCollide(function(d){
     return radiusScale(d.Amount)+1
   }));
 
-  var svg = d3.select('#chart')
+  let svg = d3.select('#chart')
     .append('svg')
     .attr('width', width)
     .attr('height', height)
     .append("g");
 
-  var radiusScale = d3.scaleSqrt()
+  let colorScale = d3.scaleOrdinal()
+    .domain(function(d){
+      return d.Category
+    })
+    .range(["#4cdf95",
+              "#b68ef2",
+              "#6ed6aa",
+              "#b5aae9",
+              "#5cddd2",
+              "#76a4ee",
+              "#54c3e5"]);
+
+  let radiusScale = d3.scaleSqrt()
     .domain([d3.min(data, function(d){return d.Amount}),d3.max(data, function(d){return d.Amount})])
     .range([10, 100]);
 
-  var circles = svg.selectAll('.fund')
+  let circles = svg.selectAll('.fund')
     .data(data)
     .enter()
     .append('circle')
-    .attr('class', 'financial-institution')
+    .attr('id', function(d){
+      return d.Category+'-'+d.Name
+    })
     .attr('r', function(d) {
       return radiusScale(d.Amount)
     })
