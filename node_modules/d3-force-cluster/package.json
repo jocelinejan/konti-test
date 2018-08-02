@@ -1,0 +1,86 @@
+{
+  "_from": "d3-force-cluster",
+  "_id": "d3-force-cluster@0.1.2",
+  "_inBundle": false,
+  "_integrity": "sha1-k/eMcDAFSvsL7Rq6cy3IbRctAgs=",
+  "_location": "/d3-force-cluster",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "d3-force-cluster",
+    "name": "d3-force-cluster",
+    "escapedName": "d3-force-cluster",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/d3-force-cluster/-/d3-force-cluster-0.1.2.tgz",
+  "_shasum": "93f78c7030054afb0bed1aba732dc86d172d020b",
+  "_spec": "d3-force-cluster",
+  "_where": "/Users/jocelinejanicekuswanto/Sites/konti",
+  "author": {
+    "name": "Eric Socolofsky",
+    "url": "http://transmote.com/"
+  },
+  "bugs": {
+    "url": "https://github.com/ericsoco/d3-force-cluster/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "tap-min": "^1.1.0"
+  },
+  "deprecated": false,
+  "description": "Clustering force for d3.forceSimulation.",
+  "devDependencies": {
+    "babel-eslint": "^7.0.0",
+    "babel-plugin-external-helpers": "^6.8.0",
+    "babel-preset-es2015": "^6.16.0",
+    "babelrc-rollup": "^3.0.0",
+    "eslint": "^3.8.1",
+    "rollup": "^0.36.3",
+    "rollup-plugin-babel": "^2.6.1",
+    "rollup-watch": "^2.5.0",
+    "sinon": "^1.17.6",
+    "tape": "^4.6.2",
+    "uglify-js": "^2.7.3"
+  },
+  "homepage": "http://ericsoco.github.io/d3-force-cluster/",
+  "jsnext:main": "dist/d3-force-cluster.mjs",
+  "keywords": [
+    "d3",
+    "d3-module",
+    "d3-force",
+    "layout",
+    "graph",
+    "cluster",
+    "infovis",
+    "dataviz"
+  ],
+  "license": "BSD-3-Clause",
+  "main": "dist/d3-force-cluster.js",
+  "module": "dist/d3-force-cluster.mjs",
+  "name": "d3-force-cluster",
+  "pre-push": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ericsoco/d3-force-cluster.git"
+  },
+  "scripts": {
+    "dist": "rollup -c",
+    "lint": "eslint lib",
+    "postdist": "npm run test",
+    "predist": "npm run lint",
+    "prepublish": "npm run dist && uglifyjs dist/d3-force-cluster.js -c -m -o dist/d3-force-cluster.min.js",
+    "publish-patch": "npm version patch && npm publish",
+    "test": "tape 'test/**/*-test.js' | tap-min",
+    "watch": "rollup -c -w"
+  },
+  "version": "0.1.2"
+}
