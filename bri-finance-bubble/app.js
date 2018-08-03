@@ -2,85 +2,71 @@ var width = window.innerWidth, //chart width
     height = window.innerHeight, // chart height
     padding = 50; //chart padding
 
+//create svg container
 var svg = d3.select('#chart')
     .append('svg')
     .attr('width', width)
     .attr('height', height)
     .append("g");
 
-var colorScale = d3.scaleOrdinal()
-    .domain(function(d){
-      return d.Category
-    })
-    .range(["rgb(178,90,237)", "rgb(47,21,139)", "rgb(220,80,142)", "rgb(26,101,135)", "rgb(92,13,71)", "rgb(87,108,231)", "rgb(157,100,145)"]);
-
-
 //load and parse CSV
 d3.csv('bri-funds.csv').then(function(data){
-  var radiusScale = d3.scaleSqrt()
-    .domain([d3.min(data, function(d){return +d.Amount}),d3.max(data, function(d){return +d.Amount})])
-    .range([10, 100]);
 
+  //convert string to numbers
   data.forEach(function(d){
     d.Amount = +d.Amount;
     d.cluster = +d.cluster;
-    d.radius = radiusScale(d.Amount);
-  }); //convert Amount to numbers
-  console.log(data); //log array
-  drawCircles(data); //draw circle after data loads
+  });
+
+  //log array
+  console.log(data);
+
+  //draw circle after data loads
+  drawCircles(data);
 })
 
 function drawCircles(data){
 
-  var m = d3.max(data, function(d){
-      return d.cluster;
-    })+1;
+  //Min and max amount
+  var minAmount = d3.min(data, function(d){return +d.Amount});
+  var maxAmount = d3.max(data, function(d){return +d.Amount});
 
-  var clusters= new Array(m);
-
-  data.map(function(d){
-    var i = d.cluster;
-    d.x = Math.cos(i / m * 2 * Math.PI) * 200 + width / 2 + Math.random();
-    d.y = Math.sin(i / m * 2 * Math.PI) * 200 + height / 2 + Math.random();
-    if (!clusters[i] || (d.radius > clusters[i].radius)) clusters[i] = d;
-    return d;
-  });
-
-
-  var forceCenter = d3.forceCenter(width/2, height/2);
-
-  var forceCluster = d3.forceCluster()
-    .centers(function(d){
-      return clusters[d.cluster];
-    })
-    .strength(0.3)
-    .centerInertia(0.01);
-
-  var forceYCenter = d3.forceY(height / 2);
-  var forceXCenter = d3.forceX(width / 2);
-
-  var splitScale = d3.scaleLinear()
-    .domain(d3.extent(data, function(d){
-      return d.cluster
-    }))
-    .range([width*0.9, width*0.1]);
-
-  var forceXSplit = d3.forceX(function(d){
-    return splitScale(d.cluster)
-  });
-
+  //Locations to move bubbles towards, depending on which view mode is selected.
+  var centerDefault = {
+    x: width/2,
+    y: height/2
+  };
 
   var simulation = d3.forceSimulation()
-  // .force('center', forceCenter)
-  .force('attract', d3.forceAttract()
-    .target([width/2, height/2])
-    .strength(0.01))
-  .force('cluster', forceCluster)
-  .force("collide", d3.forceCollide(function(d){
+  .force('center', centerDefault)
+  .force('collide', d3.forceCollide(function(d){
     return d.radius+1
   }))
   .on('tick', ticked)
   .nodes(data);
+
+  //SCALE
+
+  //set colors based on category
+  var colorScale = d3.scaleOrdinal()
+      .domain(function(d){
+        return d.Category
+      })
+      .range([
+        "rgb(178,90,237)",
+        "rgb(47,21,139)",
+        "rgb(220,80,142)",
+        "rgb(26,101,135)",
+        "rgb(92,13,71)",
+        "rgb(87,108,231)",
+        "rgb(157,100,145)"
+      ]);
+
+  //set radius based on Amount
+  var radiusScale = d3.scaleSqrt()
+      .domain([ minAmount, maxAmount ])
+      .range([ 5, 75 ]);
+
 
   var circles = svg.selectAll('circle')
     .data(data)
@@ -92,7 +78,7 @@ function drawCircles(data){
     .attr('fill', function(d){
       return colorScale(d.Category)
     })
-    .attr('fill-opacity', 0.8)
+    .attr('fill-opacity', 0.7)
     .attr('stroke', function(d){
       return colorScale(d.Category)
     });
@@ -106,47 +92,6 @@ function drawCircles(data){
   //     })
   //     .attr('font-size', 11)
 
-  var transitionTime = 3000;
-    var t = d3.timer(function (elapsed) {
-      var dt = elapsed / transitionTime;
-      simulation.force('collide').strength(Math.pow(dt, 2) * 0.7);
-      if (dt >= 1.0) t.stop();
-    });
-
-
-
-  d3.select('#type').on('click', function() {
-      console.log("you clicked me")
-    });
-
-  function continuousSplit(){
-
-    var splitState = false;
-
-    d3.select('#type').on('click', function() {
-        console.log("you clicked me");
-        if(!splitState){
-          simulation.force("x", forceXSplit)
-          .force("y", forceYCenter )
-          // .force("collide", d3.forceCollide(function(d){
-          //   return d.radius+1
-          // }))
-        } else {
-
-          simulation.force("x", forceXCenter)
-
-          data.map(function(d){
-            var i = d.cluster;
-            d.x = Math.cos(i / m * 2 * Math.PI) * 200 + width / 2 + Math.random();
-            d.y = Math.sin(i / m * 2 * Math.PI) * 200 + height / 2 + Math.random();
-          });
-        }
-
-        splitState = !splitState;
-        simulation.alpha(0.9).restart();
-    });
-  }
-
 
   function ticked() {
     circles.attr("cx", function(d) {
@@ -156,7 +101,7 @@ function drawCircles(data){
       return d.y
     })
     .attr('r', function(d) {
-      return d.radius
+      return radiusScale(d.Amount)
     });
 
     // labels.attr("x", function(d) {
@@ -167,7 +112,5 @@ function drawCircles(data){
     // })
     // .attr("text-anchor", "middle");
   }
-
-  continuousSplit();
 
 }
