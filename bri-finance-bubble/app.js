@@ -7,7 +7,7 @@ var svg = d3.select('#chart')
     .append('svg')
     .attr('width', width)
     .attr('height', height)
-    .append("g");
+    .append('g');
 
 //load and parse CSV
 d3.csv('bri-funds.csv').then(function(data){
@@ -27,23 +27,24 @@ d3.csv('bri-funds.csv').then(function(data){
 
 function drawCircles(data){
 
-  //Min and max amount
+  //min and max amount
   var minAmount = d3.min(data, function(d){return +d.Amount});
   var maxAmount = d3.max(data, function(d){return +d.Amount});
 
-  //Locations to move bubbles towards, depending on which view mode is selected.
+  //constants used in the simulation
   var centerDefault = {
     x: width/2,
     y: height/2
   };
+  var forceStrength = 0.03;
+  var bubblePadding = 1;
 
   var simulation = d3.forceSimulation()
-  .force('center', centerDefault)
+  .force('x', d3.forceX().strength(forceStrength).x(centerDefault.x))
+  .force('y', d3.forceY().strength(forceStrength).y(centerDefault.y))
   .force('collide', d3.forceCollide(function(d){
-    return d.radius+1
-  }))
-  .on('tick', ticked)
-  .nodes(data);
+    return radiusScale(d.Amount) + bubblePadding
+  }));
 
   //SCALE
 
@@ -82,6 +83,9 @@ function drawCircles(data){
     .attr('stroke', function(d){
       return colorScale(d.Category)
     });
+
+  simulation.on('tick', ticked)
+    .nodes(data);
 
   // var labels = svg.selectAll('text')
   //     .data(data)
