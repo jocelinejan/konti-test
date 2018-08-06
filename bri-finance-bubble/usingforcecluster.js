@@ -2,6 +2,7 @@ var width = window.innerWidth, //chart width
     height = window.innerHeight, // chart height
     padding = 50; //chart padding
 
+//set SVG c
 var svg = d3.select('#chart')
     .append('svg')
     .attr('width', width)

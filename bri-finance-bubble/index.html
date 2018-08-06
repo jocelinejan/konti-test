@@ -8,9 +8,16 @@
 </head>
 
 <body>
-  <button id="type">Type Split</button>
-  <div id="chart">
+  <div class="container">
+    <div id="toolbar">
+      <a href="#" id="all" class="button active">All Funds</a>
+      <a href="#" id="category" class="button">Funds by Category</a>
+      <a href="#" id="type" class="button">Funds by Type</a>
+    </div>
+    <div id="chart">
+    </div>
   </div>
+  <script src="tooltip.js"></script>
   <script src="https://d3js.org/d3.v5.js"></script>
   <script src="https://unpkg.com/d3-force-attract@latest"></script>
   <script src="https://unpkg.com/d3-force-cluster@latest"></script>

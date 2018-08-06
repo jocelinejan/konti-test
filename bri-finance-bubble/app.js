@@ -1,120 +1,205 @@
-var width = window.innerWidth, //chart width
-    height = window.innerHeight, // chart height
+function bubbleChart(){
+  var width = 854, //chart width
+    height = 600, // chart height
     padding = 50; //chart padding
 
-//create svg container
-var svg = d3.select('#chart')
-    .append('svg')
-    .attr('width', width)
-    .attr('height', height)
-    .append('g');
+  var tooltip = floatingTooltip('funds_tooltip', 240);
 
-//load and parse CSV
-d3.csv('bri-funds.csv').then(function(data){
-
-  //convert string to numbers
-  data.forEach(function(d){
-    d.Amount = +d.Amount;
-    d.cluster = +d.cluster;
-  });
-
-  //log array
-  console.log(data);
-
-  //draw circle after data loads
-  drawCircles(data);
-})
-
-function drawCircles(data){
-
-  //min and max amount
-  var minAmount = d3.min(data, function(d){return +d.Amount});
-  var maxAmount = d3.max(data, function(d){return +d.Amount});
-
-  //constants used in the simulation
-  var centerDefault = {
-    x: width/2,
-    y: height/2
+  var center = {
+    x: width / 2,
+    y: height / 2
   };
-  var forceStrength = 0.03;
-  var bubblePadding = 1;
 
-  var simulation = d3.forceSimulation()
-  .force('x', d3.forceX().strength(forceStrength).x(centerDefault.x))
-  .force('y', d3.forceY().strength(forceStrength).y(centerDefault.y))
-  .force('collide', d3.forceCollide(function(d){
-    return radiusScale(d.Amount) + bubblePadding
-  }));
-
-  //SCALE
-
-  //set colors based on category
-  var colorScale = d3.scaleOrdinal()
-      .domain(function(d){
-        return d.Category
-      })
-      .range([
-        "rgb(178,90,237)",
-        "rgb(47,21,139)",
-        "rgb(220,80,142)",
-        "rgb(26,101,135)",
-        "rgb(92,13,71)",
-        "rgb(87,108,231)",
-        "rgb(157,100,145)"
-      ]);
-
-  //set radius based on Amount
-  var radiusScale = d3.scaleSqrt()
-      .domain([ minAmount, maxAmount ])
-      .range([ 5, 75 ]);
-
-
-  var circles = svg.selectAll('circle')
-    .data(data)
-    .enter()
-    .append('circle')
-    .attr('id', function(d){
-      return d.Category+'-'+d.Name
-    })
-    .attr('fill', function(d){
-      return colorScale(d.Category)
-    })
-    .attr('fill-opacity', 0.7)
-    .attr('stroke', function(d){
-      return colorScale(d.Category)
-    });
-
-  simulation.on('tick', ticked)
-    .nodes(data);
-
-  // var labels = svg.selectAll('text')
-  //     .data(data)
-  //     .enter()
-  //     .append('text')
-  //     .text(function(d){
-  //       return d.abbr
-  //     })
-  //     .attr('font-size', 11)
-
-
-  function ticked() {
-    circles.attr("cx", function(d) {
-      return d.x
-    })
-    .attr("cy", function(d) {
-      return d.y
-    })
-    .attr('r', function(d) {
-      return radiusScale(d.Amount)
-    });
-
-    // labels.attr("x", function(d) {
-    //   return d.x
-    // })
-    // .attr("y", function(d) {
-    //   return d.y+4
-    // })
-    // .attr("text-anchor", "middle");
+  var categoryCenters = {
+    1: { x: width/3, y: height/3 },
+    2: { x: width/2, y: height/3 },
+    3: { x: 2 * width / 3, y: height/3 },
+    4: { x: width/3, y: height/2 },
+    5: { x: width/2, y: height/2 },
+    6: { x: 2 * width/3, y: height /2 },
+    7: { x: width/3, y: 2 * height/3 },
+    8: { x: width/2, y: 2 * height/3 }
   }
 
+  var financeTypeCenters = {
+    1: { x: width/3, y: height/3 },
+    2: { x: width/2, y: height/3 },
+    3: { x: 2 * width / 3, y: height/3 },
+    4: { x: width/3, y: height/2 },
+    5: { x: width/2, y: height/2 },
+    6: { x: 2 * width/3, y: height /2 },
+    7: { x: width/3, y: 2 * height/3 }
+  }
+
+  var forceStrength = 0.01;
+
+  var svg = null;
+  var bubbles =  null;
+  var nodes = [];
+
+  // function charge(d) {
+  //    return -Math.pow(d.radius, 2.0) * forceStrength;
+  //  }
+
+  var simulation = d3.forceSimulation()
+    .velocityDecay(0.2)
+    .force('x', d3.forceX().strength(forceStrength).x(center.x))
+    .force('y', d3.forceY().strength(forceStrength).y(center.y))
+    .force('collide', d3.forceCollide(function(d){
+      return d.radius + 1;
+    }))
+    // .force('charge', d3.forceManyBody().strength(charge))
+    .on('tick', ticked);
+
+  simulation.stop();
+
+  var fillColor = d3.scaleOrdinal()
+    .domain(function(d){
+      return d.category
+    })
+    .range(d3.schemePaired);
+
+  function createNodes(rawData) {
+    var minAmount = d3.min(rawData, function(d){return +d.amount});
+    var maxAmount = d3.max(rawData, function(d){return +d.amount});
+
+    console.log(maxAmount);
+
+    var radiusScale = d3.scaleSqrt()
+      .domain([minAmount,maxAmount])
+      .range([2, 70]);
+
+    var myNodes = rawData.map(function(d) {
+      return {
+        radius: radiusScale(+d.amount),
+        amount: +d.amount,
+        name: d.name,
+        category: d.category,
+        categoryCluster: +d.categoryCluster,
+        type: d.type,
+        typeCluster: +d.typeCluster,
+        categoryDescription: d.categoryDescription,
+        description: d.description,
+        x: Math.random()*width,
+        y: Math.random()*height,
+      };
+    });
+
+    myNodes.sort(function(a,b) {
+      return b.value - a.value;
+    });
+    return myNodes;
+  }
+
+
+  var chart = function chart(selector, rawData) {
+    nodes = createNodes(rawData);
+
+      console.log(nodes);
+
+    svg = d3.select(selector)
+    .append('svg')
+    .attr('width', width)
+    .attr('height', height);
+
+    bubbles = svg.selectAll('circle')
+      .data(nodes)
+      .enter()
+      .append('circle')
+      .attr('r', 0)
+      .attr('fill', function(d) {
+        return fillColor(d.category)
+      })
+      .attr('fill-opacity', 0.8)
+      .attr('stroke', function (d) {
+        return fillColor(d.category)
+      })
+      .on('mouseover', showDetail)
+      .on('mouseout', hideDetail);
+
+    bubbles.transition()
+      .duration(2000)
+      .attr('r', function(d) { return d.radius });
+
+    simulation.nodes(nodes);
+
+    groupBubbles();
+  }
+
+  function ticked() {
+    bubbles
+      .attr('cx', function (d) { return d.x; })
+      .attr('cy', function (d) { return d.y; });
+  }
+
+  function nodeCategory(d) {
+    return categoryCenters[d.categoryCluster].x;
+  }
+
+  function groupBubbles() {
+    simulation.force('x', d3.forceX().strength(forceStrength).x(center.x));
+    simulation.alpha(1).restart();
+  }
+
+  function splitBubbles() {
+    simulation.force('x', d3.forceX().strength(forceStrength).x(nodeCategory));
+    simulation.alpha(1).restart();
+  }
+
+  function showDetail(d) {
+    d3.select(this).attr('stroke', 'black');
+
+    var name = '<span class="name">Name: </span><span class="value">' +
+                d.name +
+                '</span><br/>';
+
+
+    if(d.amount === 0) {
+      var amount = '<span class="name">Amount: </span><span class="value">Pending</span><br/>';
+    } else {
+      var amount =
+        '<span class="name">Amount: </span><span class="value">$' + d.amount + ' Billion </span><br/>';
+    }
+    console.log(amount);
+    var content =  name + amount;
+
+
+    tooltip.showTooltip(content, d3.event);
+  }
+
+  function hideDetail(d) {
+     // reset outline
+     d3.select(this)
+      .attr('stroke', function (d) {
+        return fillColor(d.category)
+      });
+
+     tooltip.hideTooltip();
+  }
+
+   chart.toggleDisplay = function (displayName) {
+     if (displayName === 'year') {
+       splitBubbles();
+     } else {
+       groupBubbles();
+     }
+   };
+
+
+  return chart;
 }
+
+var myBubbleChart = bubbleChart();
+
+// function display(error, data){
+//   console.log(error)
+//   console.log(data);
+//
+//   // myBubbleChart('#chart', data);
+// }
+
+d3.csv('bri-finance.csv').then(function(data){
+  console.log(data)
+
+  myBubbleChart('#chart', data)
+});
