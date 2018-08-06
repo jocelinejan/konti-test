@@ -1,6 +1,6 @@
 function bubbleChart(){
-  var width = 854, //chart width
-    height = 600, // chart height
+  var width = window.innerWidth, //chart width
+    height = window.innerHeight, // chart height
     padding = 50; //chart padding
 
   var tooltip = floatingTooltip('funds_tooltip', 240);
@@ -10,26 +10,17 @@ function bubbleChart(){
     y: height / 2
   };
 
-  var categoryCenters = {
-    1: { x: width/3, y: height/3 },
-    2: { x: width/2, y: height/3 },
-    3: { x: 2 * width / 3, y: height/3 },
-    4: { x: width/3, y: height/2 },
+  var splitCenters = {
+    1: { x: width/6, y: height/6 },
+    2: { x: width/2, y: height/6 },
+    3: { x: 5 * width / 6, y: height/6 },
+    4: { x: width/6, y: height/2 },
     5: { x: width/2, y: height/2 },
-    6: { x: 2 * width/3, y: height /2 },
-    7: { x: width/3, y: 2 * height/3 },
-    8: { x: width/2, y: 2 * height/3 }
+    6: { x: 5 * width/6, y: height /2 },
+    7: { x: width/6, y: 5 * height/6 },
+    8: { x: width/2, y: 5 * height/6 }
   }
 
-  var financeTypeCenters = {
-    1: { x: width/3, y: height/3 },
-    2: { x: width/2, y: height/3 },
-    3: { x: 2 * width / 3, y: height/3 },
-    4: { x: width/3, y: height/2 },
-    5: { x: width/2, y: height/2 },
-    6: { x: 2 * width/3, y: height /2 },
-    7: { x: width/3, y: 2 * height/3 }
-  }
 
   var forceStrength = 0.01;
 
@@ -80,14 +71,15 @@ function bubbleChart(){
         typeCluster: +d.typeCluster,
         categoryDescription: d.categoryDescription,
         description: d.description,
-        x: Math.random()*width,
-        y: Math.random()*height,
+        x: Math.random()*900,
+        y: Math.random()*800,
       };
     });
 
     myNodes.sort(function(a,b) {
       return b.value - a.value;
     });
+
     return myNodes;
   }
 
@@ -132,17 +124,37 @@ function bubbleChart(){
       .attr('cy', function (d) { return d.y; });
   }
 
-  function nodeCategory(d) {
-    return categoryCenters[d.categoryCluster].x;
+  function nodeCategoryX(d) {
+    return splitCenters[d.categoryCluster].x;
+  }
+
+  function nodeCategoryY(d) {
+    return splitCenters[d.categoryCluster].y;
+  }
+
+  function nodeTypeX(d) {
+    return splitCenters[d.typeCluster].x;
+  }
+
+  function nodeTypeY(d) {
+    return splitCenters[d.typeCluster].y;
   }
 
   function groupBubbles() {
     simulation.force('x', d3.forceX().strength(forceStrength).x(center.x));
+    simulation.force('y', d3.forceY().strength(forceStrength).y(center.y));
     simulation.alpha(1).restart();
   }
 
-  function splitBubbles() {
-    simulation.force('x', d3.forceX().strength(forceStrength).x(nodeCategory));
+  function splitBubblesCategory() {
+    simulation.force('x', d3.forceX().strength(0.02).x(nodeCategoryX));
+    simulation.force('y', d3.forceY().strength(0.02).y(nodeCategoryY));
+    simulation.alpha(1).restart();
+  }
+
+  function splitBubblesType() {
+    simulation.force('x', d3.forceX().strength(0.02).x(nodeTypeX));
+    simulation.force('y', d3.forceY().strength(0.02).y(nodeTypeY));
     simulation.alpha(1).restart();
   }
 
@@ -178,8 +190,10 @@ function bubbleChart(){
   }
 
    chart.toggleDisplay = function (displayName) {
-     if (displayName === 'year') {
-       splitBubbles();
+     if (displayName === 'category') {
+       splitBubblesCategory();
+     } else if (displayName === 'type') {
+       splitBubblesType();
      } else {
        groupBubbles();
      }
@@ -191,6 +205,26 @@ function bubbleChart(){
 
 var myBubbleChart = bubbleChart();
 
+function setupButtons() {
+  d3.select('#toolbar')
+    .selectAll('.button')
+    .on('click', function () {
+      // Remove active class from all buttons
+      d3.selectAll('.button').classed('active', false);
+      // Find the button just clicked
+      var button = d3.select(this);
+
+      // Set it as the active button
+      button.classed('active', true);
+
+      // Get the id of the button
+      var buttonId = button.attr('id');
+
+      // Toggle the bubble chart based on
+      // the currently clicked button.
+      myBubbleChart.toggleDisplay(buttonId);
+    });
+}
 // function display(error, data){
 //   console.log(error)
 //   console.log(data);
@@ -203,3 +237,5 @@ d3.csv('bri-finance.csv').then(function(data){
 
   myBubbleChart('#chart', data)
 });
+
+setupButtons();
