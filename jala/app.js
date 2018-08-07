@@ -36,6 +36,8 @@ function drawMap(basemap_data){
 function drawBubble(){
   d3.csv('jalaxkonti.csv').then(function(language_data){
 
+    console.log(language_data);
+
     language_data.forEach(function(d) {
       d.x = projection([+d.lon, +d.lat])[0]
       d.y = projection([+d.lon, +d.lat])[1]
@@ -85,13 +87,14 @@ function drawBubble(){
           return '#80312B'
         }
       })
-      .on('mouseover', showChildren);
+      .on('click', showChildren)
+      .on('mouseout', hideChildren);
 
     function showChildren(d) {
 
       var selection = d3.select(this);
 
-      console.log(selection);
+      var selectedLanguage = selection._groups["0"]["0"].__data__.language;
 
       d3.select(this)
         .attr('stroke', 'white')
@@ -101,8 +104,10 @@ function drawBubble(){
       parent.transition()
         .duration(400)
         .attr("r", function(d) {
-          if((+d.hierarchy === 2)) {
+          if((+d.hierarchy === 2) && (d.parent === selectedLanguage)) {
             return 40
+          } else if (+d.hierarchy === 2) {
+            return 0
           } else {
             return innerRadius
           }
