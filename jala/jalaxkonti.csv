@@ -1,0 +1,28 @@
+language,parent,hierarchy,branch,script,areas,speakers,lon,lat,angle
+Dravidian,,1,,,,,78.055719,11.310312,
+Tamil,Dravidian,2,"Tamil-Kannada, Tamil-Malayalam","Tamil (Brahmic), previously also Grantha and Pallava","Tamil Nadu, Puducherry, Andaman & Nicobar Islands, Sri Lanka, Singapore, Malaysia, Mauritius, South Africa","74,678,890",78.055719,11.310312,0
+Malayalam,Dravidian,2,"Tamil-Kannada, Tamil-Malayalam","Malayalam (Brahmic), previously also Grantha","Kerala, Lakshadweep, Mahe district of Puducherry, Dakshina, Singapore","35,247,100",78.055719,11.310312,30
+Kannada,Dravidian,2,Tamil-Kannada ,Kannada (Brahmic),"Karnataka, also Andhra Pradesh, Telangana, Tamil Nadu, Maharashtra, Kerala, Goa","46,752,570",78.055719,11.310312,60
+Indo-Aryan,,1,,,,,74.436066,24.166007,
+Punjabi,Indo-Aryan,2,,Gurmukhi (Brahmic) derived from Laṇḍā and Shahmukhi (Arabic),"Punjab, Haryana, Chandigarh, Delhi, Pakistan (Punjab)","92,722,200",74.436066,24.166007,0
+Gujarati,Indo-Aryan,2,,"Gujarati (Brahmi), an abugida variant of Devanāgarī script.","Gujarat, Daman, Diu, Dadra, Nagar Haveli","46,888,670",74.436066,24.166007,30
+Hindi,Indo-Aryan,2,,"Devanāgarī (in India), Urdu script (in Pakistan)","North India, Pakistan, Fiji, Nepal, Singapore, South Africa","534,271,550",74.436066,24.166007,60
+Bengali,Indo-Aryan,2,"Magadhi Prakrit, Bengali-Assamese",Bengali abugida (Brahmi),"West Bengal, Tripura, Jharkhand, Assam; and Bangladesh","261,862,630",74.436066,24.166007,90
+Marathi,Indo-Aryan,2,Marathi-Konkani,Devanāgarī,"Maharashtra (mainly), Goa, Karnataka, Madhya Pradesh, Chattisgarh, Gujarat, Tamil Nadu, Telangana, Andhra Pradesh, Dadra and Nagar, Haveli, Daman and Diu","74,796,800",74.436066,24.166007,120
+Odia,Indo-Aryan,2,,Odia alphabet,Odisha,"32,139,520",74.436066,24.166007,150
+Maithili,Indo-Aryan,2,Bihari,"Devanāgarī, Tirhuta, Kaithi, previously Maithili","Northern and eastern Bihar in India, and Nepal","34,085,000",74.436066,24.166007,180
+Bhojpuri,Indo-Aryan,2,-,"Devanāgarī, previously Kaithi","Bihar, Jharkhand, Madhya Pradesh, and Uttar Pradesh in (Bhojpuri and Purvanchal region) in India, and Terai and Madhesh regions in Nepal, Mauritius","39,605,300",74.436066,24.166007,210
+Magahi,Indo-Aryan,2,-,"Devanāgarī, Kaithi","Bihar-Jharkhand region of eastern India (10 districts of Bihar, 8 districts of Jharkhand)","14,046,400",74.436066,24.166007,240
+Assamese,Indo-Aryan,2,Bengali-Assamese,Assamese,mainly Assam,"12,828,310",74.436066,24.166007,270
+Tai-Kadai,,1,,,,,93.190116,26.271111,
+Phake,Tai-Kadai,2,,Burmese script,"Buri Dihing Valley of Assam, India",2000,93.190116,26.271111,0
+Aiton,Tai-Kadai,2,,Burmese script,"Northeastern state of Assam, India",1500,93.190116,26.271111,30
+Khamyang,Tai-Kadai,2,,,"Powaimukh village in Tinsukia district, Assam, India.",50,93.190116,26.271111,60
+Austroasiatic,,1,,,,,90.216124,23.003089,90
+Khasi,Austroasiatic,2,Mon-Khmer,Latin,"Meghalaya, Northeast India. Also Assam and Bangladesh","843,000",90.216124,23.003089,120
+Santali,Austroasiatic,2,"North Munda, Kherwari","Ol Chiki, Devanagari, Eastern Nagari, Odia, Latin","Jharkhand, Bihar, Odisha, Tripura, Mizoram, Assam and West Bengal. Also in Bangladesh, Bhutan and Nepal","6,220,280",90.216124,23.003089,150
+Mundari,Austroasiatic,2,"North Munda, Kherwari","Mundari Bani, Devanagari, Oriya, Eastern Nagari, Latin",Assam and Jharkhand. Also in Bangladesh and Nepal,"1,120,280",90.216124,23.003089,180
+Sino-Tibetan,,1,,,,,83.649155,27.23602,
+Ladakhi/Bhoti,Sino-Tibetan,2,"Tibetic, Ladakhi-Balti",Tibetan script,"Leh district, Ladakh region of Jammu & Kashmir in India, Western Xizang in China","117,000",83.649155,27.23602,0
+Manipuri/Meitei,Sino-Tibetan,2,,Eastern Nagari script. Previously Meitei,Assam and Tripura in Northeast India. Also in Bangladesh and Myanmar,"1,485,000",83.649155,27.23602,30
+Lepcha,Sino-Tibetan,2,Tibeto-Burman,Lepcha script and Tibetan alphabet,"Sikkim and parts of West Bengal in India, Nepal and Bhutan","69,800",83.649155,27.23602,60
