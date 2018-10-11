@@ -1,6 +1,6 @@
 function bubbleChart(){
-  var width = window.innerWidth, //chart width
-    height = window.innerHeight, // chart height
+  var width = 900, //chart width
+    height = 636, // chart height
     padding = 50; //chart padding
 
   var tooltip = floatingTooltip('funds_tooltip', 240);
@@ -48,7 +48,20 @@ function bubbleChart(){
     .domain(function(d){
       return d.category
     })
-    .range(d3.schemePaired);
+  //   .range(
+  //     ["#9b48db",
+  // "#47ac92",
+  // "#d049ac",
+  // "#619fc2",
+  // "#553aa5",
+  // "#cb87b9",
+  // "#484e7f",
+  // "#7e80d8",
+  // "#773164"]
+  //   )
+    .range(
+      ['#762a83','#9970ab','#c2a5cf','#e7d4e8','#d9f0d3','#a6dba0','#5aae61','#1b7837']
+    );
 
   function createNodes(rawData) {
     var minAmount = d3.min(rawData, function(d){return +d.amount});
@@ -102,7 +115,7 @@ function bubbleChart(){
       .attr('fill', function(d) {
         return fillColor(d.category)
       })
-      .attr('fill-opacity', 0.8)
+      .attr('fill-opacity', 0.7)
       .attr('stroke', function (d) {
         return fillColor(d.category)
       })
@@ -147,8 +160,8 @@ function bubbleChart(){
   }
 
   function splitBubblesCategory() {
-    simulation.force('x', d3.forceX().strength(0.02).x(nodeCategoryX));
-    simulation.force('y', d3.forceY().strength(0.02).y(nodeCategoryY));
+    simulation.force('x', d3.forceX().strength(0.03).x(nodeCategoryX));
+    simulation.force('y', d3.forceY().strength(0.03).y(nodeCategoryY));
     simulation.alpha(1).restart();
   }
 
